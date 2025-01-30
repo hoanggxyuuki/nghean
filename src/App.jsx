@@ -9,16 +9,15 @@ function App() {
   const [selectedWord, setSelectedWord] = useState('')
   const [translation, setTranslation] = useState('')
   const handleWordClick = (text, isInput) => {
-    const word = text.trim()
+    const word = text.trim().toLowerCase()
     setSelectedWord(word)
     
     if (isInput) {
-      
       const translation = dictionary[word] || 'Không tìm thấy bản dịch'
       setTranslation(translation)
     } else {
-      
-      const ngheAnWord = Object.entries(dictionary).find(([_, viet]) => viet === word)?.[0] || 'Không tìm thấy từ gốc'
+      const ngheAnWord = Object.entries(dictionary)
+        .find(([_, viet]) => viet.toLowerCase() === word)?.[0] || 'Không tìm thấy từ gốc'
       setTranslation(ngheAnWord)
     }
   }
@@ -27,34 +26,32 @@ function App() {
       let result = text;
       console.log('Input text:', text);
       
-     
+      let lowerResult = result.toLowerCase();
+      
       const entries = Object.entries(dictionary)
         .sort((a, b) => {
-      
           if (b[0].length !== a[0].length) {
             return b[0].length - a[0].length;
           }
-          
           return b[0].localeCompare(a[0]);
         });
   
       for (const [ngheAn, vietNam] of entries) {
-      
-        const escapedTerm = ngheAn.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const escapedTerm = ngheAn.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         const regex = new RegExp(`(?<!\\S)${escapedTerm}(?!\\S)`, 'g');
         
-        if (result === ngheAn) {
+        if (lowerResult === ngheAn.toLowerCase()) {
           console.log(`Exact match: ${ngheAn} -> ${vietNam}`);
           return vietNam;
         }
         
-        if (regex.test(result)) {
+        if (regex.test(lowerResult)) {
           console.log(`Matching: ${ngheAn} -> ${vietNam}`);
-          result = result.replace(regex, vietNam);
+          lowerResult = lowerResult.replace(regex, vietNam);
         }
       }
       
-      return result;
+      return lowerResult;
       
     } catch (error) {
       console.error('Translation error:', error);
